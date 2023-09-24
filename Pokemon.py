@@ -66,12 +66,12 @@ class Pokemon:
         d = pokemon.defense if move['Category'] == 'Physical' else pokemon.sd
         effectiveness = Pokemon.type_chart[pokemon.type][move['Type']]
         
+        if (move['Type'] == 'Fire' or move['Type'] == 'Grass') and self.hp <= (self.max_hp / 3): #trigger in a pinch ability
+            power *= 1.5
+            
         if random.randint(1, 100) > accuracy:
             damage = 0
             event = Event(Event.MISS, move, damage)
-        #elif move['Category'] == 'Status':
-        #    damage = 0
-
         else:
             damage = ((((((2 * self.level) / 5) + 2) * power * (a / d)) / 50) + 2) * effectiveness
             
@@ -93,17 +93,17 @@ class Pokemon:
             print(f"{i + 1}. {move['Name']} ({move['Type']} type)")
 
 charmander_moves = [
-    {'Name': 'Scratch', 'Type': 'Normal', 'Power': 40, 'Category': 'Physical', 'Accuracy': 100},
-    {'Name': 'Ember', 'Type': 'Fire', 'Power': 40, 'Category': 'Special', 'Accuracy': 100},
-    {'Name': 'Dragon Rage', 'Type': 'Dragon', 'Power': 40, 'Category': 'Special', 'Accuracy': 100},
+    {'Name': 'Scratch', 'Type': 'Normal', 'Power': 55, 'Category': 'Physical', 'Accuracy': 100},
+    {'Name': 'Ember', 'Type': 'Fire', 'Power': 40, 'Category': 'Special', 'Accuracy': 90},
+    {'Name': 'Dragon Rage', 'Type': 'Dragon', 'Power': 40, 'Category': 'Special', 'Accuracy': 90},
     {'Name': 'Flamethrower', 'Type': 'Fire', 'Power': 80, 'Category': 'Special', 'Accuracy': 70},
 ]
 
 bulbasaur_moves = [
-    {'Name': 'Bullet Seed', 'Type': 'Grass', 'Power': 25, 'Category': 'Physical', 'Accuracy': 100},
-    {'Name': 'Tackle', 'Type': 'Normal', 'Power': 40, 'Category': 'Physical', 'Accuracy': 100},
-    {'Name': 'Razor Leaf', 'Type': 'Grass', 'Power': 55, 'Category': 'Special', 'Accuracy': 95},
-    {'Name': 'Seed Bomb', 'Type': 'Grass', 'Power': 80, 'Category': 'Physical', 'Accuracy': 100},
+    {'Name': 'Tackle', 'Type': 'Normal', 'Power': 55, 'Category': 'Physical', 'Accuracy': 100},
+    {'Name': 'Razor Leaf', 'Type': 'Grass', 'Power': 55, 'Category': 'Special', 'Accuracy': 80},
+    {'Name': 'Seed Bomb', 'Type': 'Grass', 'Power': 80, 'Category': 'Physical', 'Accuracy': 90},
+    {'Name': 'Solar Beam', 'Type': 'Grass', 'Power': 120, 'Category': 'Special', 'Accuracy': 60},
 ]
 
 def select_move(pokemon):
@@ -119,8 +119,8 @@ def select_move(pokemon):
         except ValueError:
             print("Invalid input. Please enter a number.")
 
-player = Pokemon('Charmander', 'Fire', charmander_moves, 39, 52, 60, 43, 50, 5)#, 65) <- speed not used
-opponent = Pokemon('Bulbasaur', 'Grass', bulbasaur_moves, 45, 49, 65, 49, 65, 5)#, 45)
+player = Pokemon('Charmander', 'Fire', charmander_moves, 39, 52, 60, 43, 50, 5)
+opponent = Pokemon('Bulbasaur', 'Grass', bulbasaur_moves, 45, 49, 65, 49, 65, 5)
 
 def opposite(string):
     nspace = 100 - len(string)
@@ -155,33 +155,34 @@ def print_battle():
     print()
 
 def main():
+    print_battle()
+    
     while player.hp > 0 and opponent.hp > 0:
-        # Let the user select moves for Charmander and Charmeleon
+        # Player turn
         player_move_index = select_move(player)
-        opponent_move_index = opponent.aiMoveCalculator(player)
-
-        # Calculate damage for the selected moves and apply it to the opponent
         player_damage, player_event = player.damageCalculator(player_move_index, opponent)
-        opponent_damage, opponent_event = opponent.damageCalculator(opponent_move_index, player)
-
+        
         print_battle()
 
         opponent.hp -= player_damage
         reveal(f'Your {player.name} {player_event}')
-        
         time.sleep(1)
 
         print_battle()
-
+        
+        # Opponent turn
         if opponent.hp > 0:
+            
+            opponent_move_index = opponent.aiMoveCalculator(player)
+            opponent_damage, opponent_event = opponent.damageCalculator(opponent_move_index, player)
+
             player.hp -= opponent_damage
             reveal(opposite(f"Opponent's {opponent.name} {opponent_event}"))
+            time.sleep(1)
 
-        time.sleep(1)
+            print_battle()
 
-        print_battle()
-
-        time.sleep(1)
+            time.sleep(1)
 
     # Determine the winner
     if player.hp <= 0:
