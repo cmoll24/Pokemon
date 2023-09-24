@@ -1,10 +1,35 @@
 import random
+
+class Event:
+    NORMAL = 0
+    MISS = 1
+    NO_EFFECT = 2
+    NOT_EFFECTIVE = 3
+    VERY_EFFECTIVE = 4
+    
+    def __init__(self,event,move,damage):
+        self.event = event
+        self.move = move
+        self.damage = damage
+    
+    def __str__(self):
+        match self.event:
+            case 0:
+                return f'uses {self.move["Name"]} and does {self.damage:.2f} damage!'
+            case 1:
+                return f'uses {self.move["Name"]} but missed!'
+            case 2:
+                return f'uses {self.move["Name"]} but it had no effect!'
+            case 3:
+                return f"uses {self.move['Name']} and does {self.damage:.2f} damage! \nIt wasn't very effective..."
+            case 4:
+                return f'uses {self.move["Name"]} and does {self.damage:.2f} damage! \nIt was super effective!!'
+
 class Pokemon:
     '''Defense -> Attack'''
     type_chart = {
         'Fire': {'Normal': 1, 'Fire': 0.5, 'Water': 2, 'Grass': 0.5, 'Electric': 1, 'Ice': 0.5, 'Fighting': 1, 'Poison': 1, 'Ground': 2, 'Flying': 1, 'Psychic': 1, 'Bug': 0.5, 'Rock': 2, 'Ghost': 1, 'Dragon': 1, 'Dark': 1, 'Steel': 0.5, 'Fairy': 0.5},
         'Grass': {'Normal': 1, 'Fire': 2, 'Water': 0.5, 'Grass': 0.5, 'Electric': 0.5, 'Ice': 2, 'Fighting': 1,'Poison': 1, 'Ground': 0.5, 'Flying': 2, 'Psychic': 1, 'Bug': 2, 'Rock': 1, 'Ghost': 1, 'Dragon': 1,'Dark': 1, 'Steel': 1, 'Fairy': 1},
-
         }
 
     def __init__(self, name, types, moves, HP, Attack, SA, Defense, SD, Level):
@@ -23,7 +48,7 @@ class Pokemon:
         best_damage = 0
 
         for move_index, move in enumerate(self.moves):
-            damage = self.damageCalculator(move_index, pokemon)
+            damage,_ = self.damageCalculator(move_index, pokemon)
             if damage > best_damage:
                 best_damage = damage
                 best_move_index = move_index
@@ -38,14 +63,28 @@ class Pokemon:
         a = self.attack if move['Category'] == 'Physical' else self.sa
         d = pokemon.defense if move['Category'] == 'Physical' else pokemon.sd
         effectiveness = Pokemon.type_chart[pokemon.type][move['Type']]
+        
         if random.randint(1, 100) > accuracy:
             damage = 0
-        elif move['Category'] == 'Status':
-            damage = 0
+            event = Event(Event.MISS, move, damage)
+        #elif move['Category'] == 'Status':
+        #    damage = 0
 
         else:
             damage = ((((((2 * self.level) / 5) + 2) * power * (a / d)) / 50) + 2) * effectiveness
-        return damage
+            
+            match effectiveness:
+                case 0:
+                    event = Event(Event.NO_EFFECT, move, damage)
+                case 0.5:
+                    event = Event(Event.NOT_EFFECTIVE, move, damage)
+                case 2:
+                    event = Event(Event.VERY_EFFECTIVE, move, damage)
+                case _:
+                    event = Event(Event.NORMAL, move, damage)
+
+        return damage, event
+    
     def display_moves(self):
         print(f"Available moves for {self.name}:")
         for i, move in enumerate(self.moves):
@@ -78,34 +117,34 @@ def select_move(pokemon):
         except ValueError:
             print("Invalid input. Please enter a number.")
 
-charmander = Pokemon('Charmander', 'Fire', charmander_moves, 39, 52, 60, 43, 50, 5)#, 65) <- speed not used
-bulbasaur = Pokemon('Bulbasaur', 'Grass', bulbasaur_moves, 45, 49, 65, 49, 65, 5)#, 45)
+player = Pokemon('Charmander', 'Fire', charmander_moves, 39, 52, 60, 43, 50, 5)#, 65) <- speed not used
+opponent = Pokemon('Bulbasaur', 'Grass', bulbasaur_moves, 45, 49, 65, 49, 65, 5)#, 45)
 
 def main():
-    while charmander.hp > 0 and bulbasaur.hp > 0:
+    while player.hp > 0 and opponent.hp > 0:
         # Let the user select moves for Charmander and Charmeleon
         print()
-        charmander_move_index = select_move(charmander)
-        bulbasaur_move_index = bulbasaur.aiMoveCalculator(charmander)
+        player_move_index = select_move(player)
+        opponent_move_index = opponent.aiMoveCalculator(player)
 
         # Calculate damage for the selected moves and apply it to the opponent
-        charmander_damage = charmander.damageCalculator(charmander_move_index, bulbasaur)
-        charmeleon_damage = bulbasaur.damageCalculator(bulbasaur_move_index, charmander)
+        player_damage, player_event = player.damageCalculator(player_move_index, opponent)
+        opponent_damage, opponent_event = opponent.damageCalculator(opponent_move_index, player)
+        
+        opponent.hp -= player_damage
+        print(player.name,player_event)
+        
+        if opponent.hp > 0:
+            player.hp -= opponent_damage
+            print(opponent.name, opponent_event)
 
-        charmander.hp -= charmeleon_damage
-        bulbasaur.hp -= charmander_damage
-
-        print(f'{charmander.name} uses {charmander.moves[charmander_move_index]["Name"]} and does {charmander_damage:.2f} damage!')
-        print(f'{bulbasaur.name} uses {bulbasaur.moves[bulbasaur_move_index]["Name"]} and does {charmeleon_damage:.2f} damage!')
-
-        print(f'{charmander.name}\'s HP: {charmander.hp:.2f}')
-        print(f'{bulbasaur.name}\'s HP: {bulbasaur.hp:.2f}')
+        print(f'{player.name}\'s HP: {player.hp:.2f}') if player.hp > 0 else print(f'{player.name} fainted!')
+        print(f'{opponent.name}\'s HP: {opponent.hp:.2f}') if opponent.hp > 0 else print(f'{opponent.name} fainted!')
 
     # Determine the winner
-    if charmander.hp <= 0:
-        print(f'{bulbasaur.name} wins the battle!')
-    elif bulbasaur.hp <= 0:
-        print(f'{charmander.name} wins the battle!')
-
+    if player.hp <= 0:
+        print(f'{opponent.name} wins the battle!')
+    elif opponent.hp <= 0:
+        print(f'{player.name} wins the battle!')
 
 main()
