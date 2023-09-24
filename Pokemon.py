@@ -1,4 +1,5 @@
 import random
+import time
 
 class Event:
     NORMAL = 0
@@ -21,9 +22,9 @@ class Event:
             case 2:
                 return f'uses {self.move["Name"]} but it had no effect!'
             case 3:
-                return f"uses {self.move['Name']} and does {self.damage:.2f} damage! \nIt wasn't very effective..."
+                return f"uses {self.move['Name']} and does {self.damage:.2f} damage! It wasn't very effective..."
             case 4:
-                return f'uses {self.move["Name"]} and does {self.damage:.2f} damage! \nIt was super effective!!'
+                return f'uses {self.move["Name"]} and does {self.damage:.2f} damage! It was super effective!!'
 
 class Pokemon:
     '''Defense -> Attack'''
@@ -37,6 +38,7 @@ class Pokemon:
         self.type = types
         self.moves = moves  # List of 4 moves
         self.hp = HP
+        self.max_hp = HP
         self.attack = Attack
         self.sa = SA
         self.defense = Defense
@@ -120,31 +122,71 @@ def select_move(pokemon):
 player = Pokemon('Charmander', 'Fire', charmander_moves, 39, 52, 60, 43, 50, 5)#, 65) <- speed not used
 opponent = Pokemon('Bulbasaur', 'Grass', bulbasaur_moves, 45, 49, 65, 49, 65, 5)#, 45)
 
+def opposite(string):
+    nspace = 100 - len(string)
+    return (' ' * nspace) + string
+
+def reveal(*values):
+    for string in values:
+        for let in string:
+            print(let, end = '')
+            
+            if let != ' ':
+                time.sleep(0.1)
+
+def healthbar(pokemon, reverse = False):
+    max_hp = int(pokemon.max_hp)
+    hp = int(pokemon.hp)
+    
+    if not reverse:
+        return ('#' * hp) + '_' * (max_hp - hp)
+    else:
+        return  '_' * (max_hp - hp) + ('#' * hp)
+
+def print_battle():
+    print('\n'*50)
+    
+    print(opposite(f"Opponent's {opponent.name}"))
+    print(opposite((f'{healthbar(opponent, True)} : HP') if opponent.hp > 0 else f'{opponent.name} fainted!'))
+    print()
+
+    print(f'Your {player.name}')
+    print((f'HP: {healthbar(player)}') if player.hp > 0 else f'{player.name} fainted!')
+    print()
+
 def main():
     while player.hp > 0 and opponent.hp > 0:
         # Let the user select moves for Charmander and Charmeleon
-        print()
         player_move_index = select_move(player)
         opponent_move_index = opponent.aiMoveCalculator(player)
 
         # Calculate damage for the selected moves and apply it to the opponent
         player_damage, player_event = player.damageCalculator(player_move_index, opponent)
         opponent_damage, opponent_event = opponent.damageCalculator(opponent_move_index, player)
-        
+
+        print_battle()
+
         opponent.hp -= player_damage
-        print(player.name,player_event)
+        reveal(f'Your {player.name} {player_event}')
         
+        time.sleep(1)
+
+        print_battle()
+
         if opponent.hp > 0:
             player.hp -= opponent_damage
-            print(opponent.name, opponent_event)
+            reveal(opposite(f"Opponent's {opponent.name} {opponent_event}"))
 
-        print(f'{player.name}\'s HP: {player.hp:.2f}') if player.hp > 0 else print(f'{player.name} fainted!')
-        print(f'{opponent.name}\'s HP: {opponent.hp:.2f}') if opponent.hp > 0 else print(f'{opponent.name} fainted!')
+        time.sleep(1)
+
+        print_battle()
+
+        time.sleep(1)
 
     # Determine the winner
     if player.hp <= 0:
-        print(f'{opponent.name} wins the battle!')
+        reveal(f"Opponent's {opponent.name} wins the battle!")
     elif opponent.hp <= 0:
-        print(f'{player.name} wins the battle!')
+        reveal(f'Your {player.name} wins the battle!')
 
 main()
