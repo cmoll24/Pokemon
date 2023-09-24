@@ -31,6 +31,7 @@ class Pokemon:
     type_chart = {
         'Fire': {'Normal': 1, 'Fire': 0.5, 'Water': 2, 'Grass': 0.5, 'Electric': 1, 'Ice': 0.5, 'Fighting': 1, 'Poison': 1, 'Ground': 2, 'Flying': 1, 'Psychic': 1, 'Bug': 0.5, 'Rock': 2, 'Ghost': 1, 'Dragon': 1, 'Dark': 1, 'Steel': 0.5, 'Fairy': 0.5},
         'Grass': {'Normal': 1, 'Fire': 2, 'Water': 0.5, 'Grass': 0.5, 'Electric': 0.5, 'Ice': 2, 'Fighting': 1,'Poison': 1, 'Ground': 0.5, 'Flying': 2, 'Psychic': 1, 'Bug': 2, 'Rock': 1, 'Ghost': 1, 'Dragon': 1,'Dark': 1, 'Steel': 1, 'Fairy': 1},
+        'Fighting': {'Normal': 1, 'Fire': 1, 'Water': 1, 'Grass': 1, 'Electric': 1, 'Ice': 1, 'Fighting': 1,'Poison': 1, 'Ground': 1, 'Flying': 2, 'Psychic': 2, 'Bug': 0.5, 'Rock': 0.5, 'Ghost': 1, 'Dragon': 1,'Dark': 0.5, 'Steel': 1, 'Fairy': 2},
         }
 
     def __init__(self, name, types, moves, HP, Attack, SA, Defense, SD, Level):
@@ -95,7 +96,7 @@ class Pokemon:
 charmander_moves = [
     {'Name': 'Scratch', 'Type': 'Normal', 'Power': 55, 'Category': 'Physical', 'Accuracy': 100},
     {'Name': 'Ember', 'Type': 'Fire', 'Power': 40, 'Category': 'Special', 'Accuracy': 90},
-    {'Name': 'Dragon Rage', 'Type': 'Dragon', 'Power': 40, 'Category': 'Special', 'Accuracy': 90},
+    {'Name': 'Dragon Tail', 'Type': 'Dragon', 'Power': 65, 'Category': 'Physical', 'Accuracy': 90},
     {'Name': 'Flamethrower', 'Type': 'Fire', 'Power': 80, 'Category': 'Special', 'Accuracy': 70},
 ]
 
@@ -104,6 +105,13 @@ bulbasaur_moves = [
     {'Name': 'Razor Leaf', 'Type': 'Grass', 'Power': 55, 'Category': 'Special', 'Accuracy': 80},
     {'Name': 'Seed Bomb', 'Type': 'Grass', 'Power': 80, 'Category': 'Physical', 'Accuracy': 90},
     {'Name': 'Solar Beam', 'Type': 'Grass', 'Power': 120, 'Category': 'Special', 'Accuracy': 60},
+]
+
+mankey_moves = [
+    {'Name': 'Covet', 'Type': 'Normal', 'Power': 55, 'Category': 'Physical', 'Accuracy': 100},
+    {'Name': 'Bulldoze', 'Type': 'Ground', 'Power': 55, 'Category': 'Physical', 'Accuracy': 45},
+    {'Name': 'Assurance', 'Type': 'Dark', 'Power': 65, 'Category': 'Physical', 'Accuracy': 100},
+    {'Name': 'Cross Chop', 'Type': 'Fighting', 'Power': 70, 'Category': 'Physical', 'Accuracy': 80},
 ]
 
 def select_move(pokemon):
@@ -118,9 +126,6 @@ def select_move(pokemon):
                 print("Invalid input. Please select a move by entering a number between 1 and 4.")
         except ValueError:
             print("Invalid input. Please enter a number.")
-
-player = Pokemon('Charmander', 'Fire', charmander_moves, 39, 52, 60, 43, 50, 5)
-opponent = Pokemon('Bulbasaur', 'Grass', bulbasaur_moves, 45, 49, 65, 49, 65, 5)
 
 def opposite(string):
     nspace = 100 - len(string)
@@ -143,7 +148,7 @@ def healthbar(pokemon, reverse = False):
     else:
         return  '_' * (max_hp - hp) + ('#' * hp)
 
-def print_battle():
+def print_battle(player,opponent):
     print('\n'*50)
     
     print(opposite(f"Opponent's {opponent.name}"))
@@ -154,21 +159,21 @@ def print_battle():
     print((f'HP: {healthbar(player)}') if player.hp > 0 else f'{player.name} fainted!')
     print()
 
-def main():
-    print_battle()
+def main(player,opponent):
+    print_battle(player,opponent)
     
     while player.hp > 0 and opponent.hp > 0:
         # Player turn
         player_move_index = select_move(player)
         player_damage, player_event = player.damageCalculator(player_move_index, opponent)
         
-        print_battle()
+        print_battle(player,opponent)
 
         opponent.hp -= player_damage
         reveal(f'Your {player.name} {player_event}')
         time.sleep(1)
 
-        print_battle()
+        print_battle(player,opponent)
         
         # Opponent turn
         if opponent.hp > 0:
@@ -180,7 +185,7 @@ def main():
             reveal(opposite(f"Opponent's {opponent.name} {opponent_event}"))
             time.sleep(1)
 
-            print_battle()
+            print_battle(player,opponent)
 
             time.sleep(1)
 
@@ -190,4 +195,13 @@ def main():
     elif opponent.hp <= 0:
         reveal(f'Your {player.name} wins the battle!')
 
-main()
+charmander = Pokemon('Charmander', 'Fire', charmander_moves, 39, 52, 60, 43, 50, 5)
+bulbasaur = Pokemon('Bulbasaur', 'Grass', bulbasaur_moves, 45, 49, 65, 49, 65, 5)
+mankey = Pokemon('Mankey', 'Fighting', mankey_moves, 40, 80, 35, 35, 45, 5)
+
+main(charmander,bulbasaur)
+
+time.sleep(2)
+charmander.hp = charmander.max_hp
+
+main(charmander,mankey)
