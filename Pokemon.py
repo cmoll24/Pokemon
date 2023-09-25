@@ -1,5 +1,21 @@
 import random
 import time
+import sys
+import os
+
+import pygame
+pygame.mixer.init()
+pygame.mixer.music.load('Background.mp3')
+pygame.mixer.music.play(-1)
+
+def clear_screen():
+    if sys.platform.startswith('win'):
+        # For Windows
+        os.system('cls')
+    else:
+        # For Linux and macOS
+        os.system('clear')
+
 
 charmander_pattern = """
 ⬜⬜⬜⬛⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜
@@ -115,9 +131,19 @@ class Pokemon:
         d = pokemon.defense if move['Category'] == 'Physical' else pokemon.sd
         effectiveness = Pokemon.type_chart[pokemon.type][move['Type']]
 
-        if (move['Type'] == 'Fire' or move['Type'] == 'Grass') and self.hp <= (
-                self.max_hp / 3):  # trigger in a pinch ability
+        # Calculate critical hit chance
+        critical_hit_chance = 6.25
+
+        if (move['Type'] == 'Fire' or move['Type'] == 'Grass') and self.hp <= (self.max_hp / 3):
             power *= 1.5
+
+        if random.randint(1, 100) <= critical_hit_chance:
+            critical_damage = ((((((2 * self.level) / 5) + 2) * power * (a / d)) / 50) + 2) * effectiveness * 2
+            event = Event(Event.NORMAL, move, critical_damage)
+            event.event = Event.NORMAL
+            event.damage = critical_damage
+            event.is_critical = True
+            return critical_damage, event
 
         if random.randint(1, 100) > accuracy:
             damage = 0
@@ -125,15 +151,14 @@ class Pokemon:
         else:
             damage = ((((((2 * self.level) / 5) + 2) * power * (a / d)) / 50) + 2) * effectiveness
 
-            match effectiveness:
-                case 0:
-                    event = Event(Event.NO_EFFECT, move, damage)
-                case 0.5:
-                    event = Event(Event.NOT_EFFECTIVE, move, damage)
-                case 2:
-                    event = Event(Event.VERY_EFFECTIVE, move, damage)
-                case _:
-                    event = Event(Event.NORMAL, move, damage)
+            if effectiveness == 0:
+                event = Event(Event.NO_EFFECT, move, damage)
+            elif effectiveness == 0.5:
+                event = Event(Event.NOT_EFFECTIVE, move, damage)
+            elif effectiveness == 2:
+                event = Event(Event.VERY_EFFECTIVE, move, damage)
+            else:
+                event = Event(Event.NORMAL, move, damage)
 
         return damage, event
 
