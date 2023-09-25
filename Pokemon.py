@@ -3,13 +3,13 @@ import time
 import sys
 import os
 
-#import pygame
-#try:
-#    pygame.mixer.init()
-#    pygame.mixer.music.load('Background.mp3')
-#    pygame.mixer.music.play(-1)
-#except:
-#    pass
+import pygame
+try:
+    pygame.mixer.init()
+    pygame.mixer.music.load('Background.mp3')
+    pygame.mixer.music.play(-1)
+except:
+    pass
 
 def clear_screen():
     if sys.platform.startswith('win'):
@@ -250,7 +250,7 @@ def print_visuals(player, opponent):
         else:
             print(space_pattern * player_width, end = '')
         
-        print(space_pattern, end = '')
+        print(space_pattern * 3, end = '')
         
         if i < opponent_len:
             print(opponent.pattern[i], end = '')
