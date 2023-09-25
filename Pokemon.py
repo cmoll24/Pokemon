@@ -3,14 +3,13 @@ import time
 import sys
 import os
 
-import pygame
-
-try:
-    pygame.mixer.init()
-    pygame.mixer.music.load('Background.mp3')
-    pygame.mixer.music.play(-1)
-except:
-    pass
+#import pygame
+#try:
+#    pygame.mixer.init()
+#    pygame.mixer.music.load('Background.mp3')
+#    pygame.mixer.music.play(-1)
+#except:
+#    pass
 
 def clear_screen():
     if sys.platform.startswith('win'):
@@ -221,7 +220,8 @@ def opposite(string):
 def reveal(*values):
     for string in values:
         for let in string:
-            print(let, end='')
+            sys.stdout.write(let)
+            sys.stdout.flush()
 
             if let != ' ':
                 time.sleep(0.1)
