@@ -257,7 +257,7 @@ def healthbar(pokemon, reverse=False):
     if not reverse:
         return 'HP: ' + (red * hp) + empty * (max_hp - hp)
     else:
-        return (' ' * (100 - max_hp)) + empty * (max_hp - hp) + (red * hp) + ' : HP'
+        return (' ' * (100 - max_hp - 5)) + empty * (max_hp - hp) + (red * hp) + ' : HP'
 
 def print_visuals(player, opponent):
     player_len = len(player.pattern)
