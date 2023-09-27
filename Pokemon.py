@@ -333,11 +333,11 @@ def main(player, opponent):
 
 charmander = Pokemon('Charmander', 'Fire', charmander_moves, 39, 52, 60, 43, 50, 5, charmander_pattern)
 bulbasaur = Pokemon('Bulbasaur', 'Grass', bulbasaur_moves, 45, 49, 65, 49, 65, 5, bulbasaur_pattern)
-mankey = Pokemon('Mankey', 'Fighting', mankey_moves, 40, 80, 35, 35, 45, 5, mankey_pattern)
-
 main(charmander, bulbasaur)
 
 time.sleep(2)
-charmander.hp = charmander.max_hp
+charmander = Pokemon('Charmander', 'Fire', charmander_moves, 39, 52, 60, 43, 50, 5, charmander_pattern)
+mankey = Pokemon('Mankey', 'Fighting', mankey_moves, 40, 80, 35, 35, 45, 5, mankey_pattern)
+
 
 main(charmander, mankey)
