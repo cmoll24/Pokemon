@@ -289,7 +289,7 @@ def print_battle(player, opponent):
     print_visuals(player,opponent)
 
     print(f'Your {player.name}')
-    print((f'HP: {healthbar(player)}') if player.hp > 0 else f'{player.name} fainted!')
+    print(healthbar(player) if player.hp > 0 else f'{player.name} fainted!')
     print()
 
 def reverse_sprite(pattern):
