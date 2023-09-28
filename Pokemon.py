@@ -11,15 +11,6 @@ try:
 except:
     pass
 
-def clear_screen():
-    if sys.platform.startswith('win'):
-        # For Windows
-        os.system('cls')
-    else:
-        # For Linux and macOS
-        os.system('clear')
-
-
 space_pattern = '⬜'
 
 charmander_pattern = [
@@ -150,6 +141,7 @@ class Pokemon:
         return best_move_index
 
     def damageCalculator(self, move_index, pokemon):
+        '''returns the amount of damage a move would do when preformed by self attacking a pokemon'''
         move = self.moves[move_index]
         power = move['Power']
         accuracy = move['Accuracy']
@@ -215,8 +207,16 @@ mankey_moves = [
     {'Name': 'Cross Chop', 'Type': 'Fighting', 'Power': 70, 'Category': 'Physical', 'Accuracy': 80},
 ]
 
+def clear_screen():
+    if sys.platform.startswith('win'):
+        # For Windows
+        os.system('cls')
+    else:
+        # For Linux and macOS
+        os.system('clear')
 
 def select_move(pokemon):
+    '''gets an input (1-4) from player corresponding to a move of a pokemon'''
     while True:
         pokemon.display_moves()
         choice = input(f"Select a move for {pokemon.name} (1-4): ")
@@ -246,6 +246,7 @@ def reveal(*values):
 
 
 def healthbar(pokemon, reverse=False):
+    '''returns a string representing the health of the pokemon'''
     max_hp = int(pokemon.max_hp)
     hp = int(pokemon.hp)
 
@@ -258,6 +259,7 @@ def healthbar(pokemon, reverse=False):
         return (' ' * (100 - max_hp - 5)) + empty * (max_hp - hp) + (red * hp) + ' : HP'
 
 def print_visuals(player, opponent):
+    '''prints two pokemon sprites next to each other'''
     player_len = len(player.pattern)
     player_width = len(player.pattern[0])
     opponent_len = len(opponent.pattern)
@@ -280,7 +282,8 @@ def print_visuals(player, opponent):
         print(end='\n')
 
 def print_battle(player, opponent):
-    print('\n' * 50)
+    '''displays the visuals for the battle'''
+    clear_screen()
 
     print(opposite(f"Opponent's {opponent.name}"))
     print(healthbar(opponent, True) if opponent.hp > 0 else opposite(f'{opponent.name} fainted!'))
@@ -293,6 +296,7 @@ def print_battle(player, opponent):
     print()
 
 def reverse_sprite(pattern):
+  '''reverses the player pattern so they look towards the opponent'''
   return [i[::-1] for i in pattern]
 
 def main(player, opponent):
@@ -338,5 +342,6 @@ main(charmander, bulbasaur)
 time.sleep(2)
 charmander = Pokemon('Charmander', 'Fire', charmander_moves, 39, 52, 60, 43, 50, 5, charmander_pattern)
 mankey = Pokemon('Mankey', 'Fighting', mankey_moves, 40, 80, 35, 35, 45, 5, mankey_pattern)
+
 
 main(charmander, mankey)
