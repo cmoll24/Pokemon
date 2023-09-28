@@ -239,7 +239,7 @@ def reveal(*values):
     for string in values:
         for let in string:
             sys.stdout.write(let)
-            sys.stdout.flush()
+            sys.stdout.flush() #https://stackoverflow.com/questions/20302331/typing-effect-in-python
 
             if let != ' ':
                 time.sleep(0.1)
@@ -338,6 +338,5 @@ main(charmander, bulbasaur)
 time.sleep(2)
 charmander = Pokemon('Charmander', 'Fire', charmander_moves, 39, 52, 60, 43, 50, 5, charmander_pattern)
 mankey = Pokemon('Mankey', 'Fighting', mankey_moves, 40, 80, 35, 35, 45, 5, mankey_pattern)
-
 
 main(charmander, mankey)
