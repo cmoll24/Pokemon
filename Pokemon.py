@@ -88,16 +88,15 @@ class Event:
         self.damage = damage
 
     def __str__(self):
-        match self.event:
-            case 0:
+        if self.event == 0:
                 return f'uses {self.move["Name"]} and does {self.damage:.2f} damage!'
-            case 1:
+        elif self.event == 1:
                 return f'uses {self.move["Name"]} but missed!'
-            case 2:
+        elif self.event == 2:
                 return f'uses {self.move["Name"]} but it had no effect!'
-            case 3:
+        elif self.event == 3:
                 return f"uses {self.move['Name']} and does {self.damage:.2f} damage! It wasn't very effective..."
-            case 4:
+        elif self.event == 4:
                 return f'uses {self.move["Name"]} and does {self.damage:.2f} damage! It was super effective!!'
 
 
